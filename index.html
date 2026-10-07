@@ -5002,16 +5002,24 @@ runLoading();
   }catch(e){}
 
   function showBackButton(){
-    /* Always show the BackButton so the physical back button is captured by the
-       app's navigation logic instead of closing the mini-app unexpectedly.
-       The backAction() callback handles every state: gameplay pause, menu
-       navigation, and exit confirmation at the main menu. */
+    /* Loading screen & main menu: hide BackButton → Eitaa shows the close (×) icon.
+       All other screens (team selection, formation, gameplay, etc.): show BackButton
+       → Eitaa shows the back-arrow (<) icon.
+       The physical back button is ALWAYS intercepted by backAction() via the
+       History API popstate guard, so it never causes a sudden exit. */
     try{
       if(!W.BackButton)return;
-      if(typeof W.BackButton.show==='function')W.BackButton.show();
+      const loadingEl=document.getElementById('loadingOverlay');
+      const mainMenuEl=document.getElementById('mainMenuOverlay');
+      const loadingOpen=!!loadingEl && !loadingEl.classList.contains('hide');
+      const mainOpen=!!mainMenuEl && !mainMenuEl.classList.contains('hide');
+      if(loadingOpen || mainOpen){
+        if(typeof W.BackButton.hide==='function')W.BackButton.hide();
+      }else{
+        if(typeof W.BackButton.show==='function')W.BackButton.show();
+      }
     }catch(e){}
   }
-
   function gameIsRunning(){
     return typeof started!=='undefined' && started &&
            typeof G!=='undefined' && G.state!=='over' && !G.countdownActive;
