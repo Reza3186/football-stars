@@ -5002,19 +5002,13 @@ runLoading();
   }catch(e){}
 
   function showBackButton(){
-    /* Initial loading and the first/main menu use Eitaa's host close control:
-       hide the BackButton. All other screens keep the BackButton visible. */
+    /* Always show the BackButton so the physical back button is captured by the
+       app's navigation logic instead of closing the mini-app unexpectedly.
+       The backAction() callback handles every state: gameplay pause, menu
+       navigation, and exit confirmation at the main menu. */
     try{
       if(!W.BackButton)return;
-      const loadingEl=document.getElementById('loadingOverlay');
-      const mainMenuEl=document.getElementById('mainMenuOverlay');
-      const loadingOpen=!!loadingEl && !loadingEl.classList.contains('hide');
-      const mainOpen=!!mainMenuEl && !mainMenuEl.classList.contains('hide');
-      if(loadingOpen || mainOpen){
-        if(typeof W.BackButton.hide==='function')W.BackButton.hide();
-      }else{
-        if(typeof W.BackButton.show==='function')W.BackButton.show();
-      }
+      if(typeof W.BackButton.show==='function')W.BackButton.show();
     }catch(e){}
   }
 
