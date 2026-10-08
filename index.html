@@ -5085,11 +5085,7 @@ runLoading();
     }
   }catch(e){}
 function showBackButton(){
-    /* Dynamic header icon sync:
-       - Loading & Main menu → hide → Eitaa shows close (×) icon
-       - Team select, Formation, Training, Future, Game, Result → show → back (←) icon
-       requestAnimationFrame ensures DOM class changes are fully applied
-       before reading them, so the icon switches instantly on every transition. */
+    /* Dynamic header icon sync: ... */
     try{
       if(!W.BackButton)return;
       requestAnimationFrame(function(){
@@ -5107,10 +5103,9 @@ function showBackButton(){
         }catch(e){}
       });
     }catch(e){}
-  }
+  }   
   
-      }catch(e){}
- }
+  
   function gameIsRunning(){
     return typeof started!=='undefined' && started &&
            typeof G!=='undefined' && G.state!=='over' && !G.countdownActive;
