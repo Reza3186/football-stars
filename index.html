@@ -5084,32 +5084,31 @@ runLoading();
       screen.orientation.unlock=function(){ keepOrientationLocked(); };
     }
   }catch(e){}
-
-  function showBackButton(){
-    /* The Eitaa SDK switches between its close icon and Back arrow through
-       BackButton.hide()/show(). Determine the REAL visible page, not merely
-       whether a mounted overlay exists behind the main menu. */
+function showBackButton(){
+    /* Dynamic header icon sync:
+       - Loading & Main menu → hide → Eitaa shows close (×) icon
+       - Team select, Formation, Training, Future, Game, Result → show → back (←) icon
+       requestAnimationFrame ensures DOM class changes are fully applied
+       before reading them, so the icon switches instantly on every transition. */
     try{
       if(!W.BackButton)return;
-      const syncBackIcon=()=>{
+      requestAnimationFrame(function(){
         try{
           if(!W.BackButton)return;
+          const loadingEl=document.getElementById('loadingOverlay');
+          const mainMenuEl=document.getElementById('mainMenuOverlay');
           const loadingOpen=!!loadingEl && !loadingEl.classList.contains('hide');
-          const mainOpen=!!mainEl && !mainEl.classList.contains('hide');
-          const teamMenuOpen=!!startEl && !!mainEl && mainEl.classList.contains('hide') && !startEl.classList.contains('hide');
-          const formationOpen=!!formationEl && formationEl.classList.contains('show');
-          const trainingOpen=!!trainingEl && trainingEl.classList.contains('show');
-          const futureOpen=!!futureEl && futureEl.classList.contains('show');
-          const resultOpen=(typeof overlay!=='undefined' && overlay.classList.contains('show'));
-          const playing=gameIsRunning();
-          const secondaryOpen=teamMenuOpen||formationOpen||trainingOpen||futureOpen||resultOpen||playing;
-          if(loadingOpen || (mainOpen && !secondaryOpen)){
+          const mainOpen=!!mainMenuEl && !mainMenuEl.classList.contains('hide');
+          if(loadingOpen || mainOpen){
             if(typeof W.BackButton.hide==='function')W.BackButton.hide();
           }else{
             if(typeof W.BackButton.show==='function')W.BackButton.show();
           }
         }catch(e){}
-      };
+      });
+    }catch(e){}
+  }
+  
       requestAnimationFrame(syncBackIcon);
 
       /* One lightweight observer keeps the host header synchronized with every
