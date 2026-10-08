@@ -5109,25 +5109,8 @@ function showBackButton(){
     }catch(e){}
   }
   
-      requestAnimationFrame(syncBackIcon);
-
-      /* One lightweight observer keeps the host header synchronized with every
-         class/ARIA transition made by the existing menu code. */
-      if(!window.__TPF_EITAA_BACK_OBSERVER__ && typeof MutationObserver==='function'){
-        let queued=false;
-        const queueSync=()=>{
-          if(queued)return;
-          queued=true;
-          requestAnimationFrame(()=>{queued=false;syncBackIcon();});
-        };
-        const watched=[loadingEl,mainEl,startEl,formationEl,trainingEl,futureEl,
-                       (typeof overlay!=='undefined'?overlay:null)].filter(Boolean);
-        const obs=new MutationObserver(queueSync);
-        watched.forEach(el=>obs.observe(el,{attributes:true,attributeFilter:['class','aria-hidden']}));
-        window.__TPF_EITAA_BACK_OBSERVER__=obs;
-      }
-    }catch(e){}
-  }
+      }catch(e){}
+ }
   function gameIsRunning(){
     return typeof started!=='undefined' && started &&
            typeof G!=='undefined' && G.state!=='over' && !G.countdownActive;
