@@ -5703,52 +5703,48 @@ function showBackButton(){
 
 
 
-
-<!-- ===== Targeted-only patch: instant Eitaa header navigation sync ===== -->
+<!-- ===== FINAL: Dynamic Eitaa header icon sync ===== -->
 <script>
 (function(){
   'use strict';
 
-  /* Keep Eitaa's native BackButton state synchronized with the actual visible
-     screen. This observes only navigation overlays/classes and does not touch
-     gameplay, AI, physics, audio, controls, or layout. */
-  function syncEitaaHeaderNow(){
+  function syncHeaderIcon(){
     try{
       if(typeof showBackButton==='function')showBackButton();
     }catch(e){}
   }
 
-  const navTargets=[
-    'loadingOverlay',
-    'mainMenuOverlay',
-    'startOverlay',
-    'formationOverlay',
-    'trainingOverlay',
-    'futureOverlay',
-    'overlay'
-  ].map(id=>document.getElementById(id)).filter(Boolean);
+  /* Watch ALL menu overlays for any class/aria changes */
+  var ids=['loadingOverlay','mainMenuOverlay','startOverlay','formationOverlay',
+           'trainingOverlay','futureOverlay','overlay','pauseMenuOverlay'];
+  var targets=[];
+  for(var i=0;i<ids.length;i++){
+    var el=document.getElementById(ids[i]);
+    if(el)targets.push(el);
+  }
 
-  try{
-    const observer=new MutationObserver(function(){ syncEitaaHeaderNow(); });
-    navTargets.forEach(el=>observer.observe(el,{
-      attributes:true,
-      attributeFilter:['class','aria-hidden','style']
-    }));
-  }catch(e){}
+  if(targets.length>0 && typeof MutationObserver==='function'){
+    var pending=false;
+    var obs=new MutationObserver(function(){
+      if(pending)return;
+      pending=true;
+      requestAnimationFrame(function(){
+        pending=false;
+        syncHeaderIcon();
+      });
+    });
+    for(var j=0;j<targets.length;j++){
+      obs.observe(targets[j],{attributes:true,attributeFilter:['class','aria-hidden','style']});
+    }
+  }
 
-  document.addEventListener('click',function(e){
-    try{
-      const t=e.target && e.target.closest ? e.target.closest(
-        '#friendlyGameBtn,#futureChangesBtn,#futureBackBtn,#trainingBtn,#trainingBackBtn,#setupBackBtn,#formationBackBtn,#formationConfirm,#startBtn,#backMenuEndBtn,#againBtn,#menuBtn,#pauseMenuBtn,#pauseRestartBtn'
-      ) : null;
-      if(t){
-        if(typeof queueMicrotask==='function')queueMicrotask(syncEitaaHeaderNow);
-        else Promise.resolve().then(syncEitaaHeaderNow);
-      }
-    }catch(err){}
-  },{capture:true,passive:true});
+  /* Also sync on every click anywhere (covers all button clicks) */
+  document.addEventListener('click',function(){
+    requestAnimationFrame(syncHeaderIcon);
+  },true);
 
-  syncEitaaHeaderNow();
+  /* Initial sync */
+  syncHeaderIcon();
 })();
 </script>
 
