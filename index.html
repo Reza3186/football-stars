@@ -5085,17 +5085,20 @@ runLoading();
     }
   }catch(e){}
 function showBackButton(){
-    /* Dynamic header icon sync: ... */
+    /* Dynamic header icon sync — simplified & reliable:
+       - Main menu visible → hide → Eitaa shows close (×) icon
+       - ALL other screens (loading, team select, formation, training,
+         future, game, result) → show → back (←) icon
+       Only mainMenuOverlay state is checked. This guarantees the icon
+       switches correctly on every menu transition. */
     try{
       if(!W.BackButton)return;
       requestAnimationFrame(function(){
         try{
           if(!W.BackButton)return;
-          const loadingEl=document.getElementById('loadingOverlay');
           const mainMenuEl=document.getElementById('mainMenuOverlay');
-          const loadingOpen=!!loadingEl && !loadingEl.classList.contains('hide');
           const mainOpen=!!mainMenuEl && !mainMenuEl.classList.contains('hide');
-          if(loadingOpen || mainOpen){
+          if(mainOpen){
             if(typeof W.BackButton.hide==='function')W.BackButton.hide();
           }else{
             if(typeof W.BackButton.show==='function')W.BackButton.show();
